@@ -18,14 +18,14 @@ main =
         , subscriptions = subscriptions
         }
 
-type alias Board = Matrix Char
-
+type SquareState = Blank | XMarked | CircleMarked
+type alias Board = Matrix SquareState
 type alias Model = Board
 
 
 initialModel : Model
 initialModel =
-    square 3 (\_ -> 'X')
+    square 3 (\_ -> Blank )
 
 
 init : ( Model, Cmd Msg )
@@ -37,7 +37,7 @@ init =
 -- UPDATE
 
 type Msg
-    = NoOp | Mark Int
+    = NoOp | Mark Int Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -45,7 +45,7 @@ update msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
-        Mark pos->
+        Mark posX posY ->
             ( model, Cmd.none )
 
 
@@ -56,27 +56,34 @@ subscriptions model =
     Sub.none
 
 
+boardContent : Board -> Int -> Int -> String
+boardContent board posX posY =
+    case get (loc posX posY) board of
+        Just value ->
+            value |> toString
+        Nothing ->
+            Blank |> toString
 
 -- VIEW
 
-view : Model -> Html Msg
-view model =
+view : Board -> Html Msg
+view board =
     div [ id "container" ]
         [ div [ id "board" ]
             [ div [ class "board-row" ]
-                [ button [ class "square", onClick <| Mark 0 ] []
-                , button [ class "square", onClick <| Mark 1 ] []
-                , button [ class "square", onClick <| Mark 2 ] []
+                [ button [ class "square", onClick <| Mark 0 0 ] [text <| boardContent board 0 0]
+                , button [ class "square", onClick <| Mark 0 1 ] [text <| boardContent board 0 1]
+                , button [ class "square", onClick <| Mark 0 2 ] [text <| boardContent board 0 2]
                 ]
              , div [class "board-row" ]
-                [ button [ class "square", onClick <| Mark 3 ] []
-                , button [ class "square", onClick <| Mark 4 ] []
-                , button [ class "square", onClick <| Mark 5 ] []
+                [ button [ class "square", onClick <| Mark 1 0 ] [text <| boardContent board 1 0]
+                , button [ class "square", onClick <| Mark 1 1 ] [text <| boardContent board 1 1]
+                , button [ class "square", onClick <| Mark 1 2 ] [text <| boardContent board 1 2]
                 ]
              , div [class "board-row" ]
-                [ button [ class "square", onClick <| Mark 6 ] []
-                , button [ class "square", onClick <| Mark 7 ] []
-                , button [ class "square", onClick <| Mark 8 ] []
+                [ button [ class "square", onClick <| Mark 2 0 ] [text <| boardContent board 2 0]
+                , button [ class "square", onClick <| Mark 2 1 ] [text <| boardContent board 2 1]
+                , button [ class "square", onClick <| Mark 2 2 ] [text <| boardContent board 2 2]
                 ]
             ]
         ]
