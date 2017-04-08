@@ -5,11 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Matrix exposing (..)
 
-
---import Html.Events exposing (onClick)
-
-
-main : Program Never Model Msg
+main : Program Never Game Msg
 main =
     Html.program
         { init = init
@@ -19,37 +15,42 @@ main =
         }
 
 type SquareState = Blank | XMarked | CircleMarked
+type Player = Player1 | Player2
 type alias Board = Matrix SquareState
-type alias Model = Board
+type alias Game =
+        { board: Board
+        , turn: Player
+        }
 
 
-initialModel : Model
-initialModel =
-    square 3 (\_ -> Blank )
+initialGame : Game
+initialGame =
+    { board = square 3 (\_ -> Blank )
+    , turn = Player1
+    }
 
 
-init : ( Model, Cmd Msg )
+init : ( Game, Cmd Msg )
 init =
-    ( initialModel, Cmd.none )
+    ( initialGame, Cmd.none )
 
 
 -- UPDATE
 
 type Msg = NoOp | Mark Int Int
 
-
-update : Msg -> Board -> ( Board, Cmd Msg )
-update msg board =
+update : Msg -> Game -> ( Game, Cmd Msg )
+update msg game =
     case msg of
         NoOp ->
-            ( board, Cmd.none )
+            ( game, Cmd.none )
         Mark posX posY ->
-            ( set (loc posX posY) XMarked board, Cmd.none )
+            ( { game | board = set (loc posX posY) CircleMarked game.board }, Cmd.none )
 
 
 -- SUBSCRIPTIONS
 
-subscriptions : Model -> Sub Msg
+subscriptions : Game -> Sub Msg
 subscriptions model =
     Sub.none
 
@@ -74,24 +75,24 @@ squareToString square =
 
 -- VIEW
 
-view : Board -> Html Msg
-view board =
+view : Game -> Html Msg
+view game =
     div [ id "container" ]
         [ div [ id "board" ]
             [ div [ class "board-row" ]
-                [ button [ class "square", onClick <| Mark 0 0 ] [text <| boardContent board 0 0]
-                , button [ class "square", onClick <| Mark 0 1 ] [text <| boardContent board 0 1]
-                , button [ class "square", onClick <| Mark 0 2 ] [text <| boardContent board 0 2]
+                [ button [ class "square", onClick <| Mark 0 0 ] [text <| boardContent game.board 0 0]
+                , button [ class "square", onClick <| Mark 0 1 ] [text <| boardContent game.board 0 1]
+                , button [ class "square", onClick <| Mark 0 2 ] [text <| boardContent game.board 0 2]
                 ]
              , div [class "board-row" ]
-                [ button [ class "square", onClick <| Mark 1 0 ] [text <| boardContent board 1 0]
-                , button [ class "square", onClick <| Mark 1 1 ] [text <| boardContent board 1 1]
-                , button [ class "square", onClick <| Mark 1 2 ] [text <| boardContent board 1 2]
+                [ button [ class "square", onClick <| Mark 1 0 ] [text <| boardContent game.board 1 0]
+                , button [ class "square", onClick <| Mark 1 1 ] [text <| boardContent game.board 1 1]
+                , button [ class "square", onClick <| Mark 1 2 ] [text <| boardContent game.board 1 2]
                 ]
              , div [class "board-row" ]
-                [ button [ class "square", onClick <| Mark 2 0 ] [text <| boardContent board 2 0]
-                , button [ class "square", onClick <| Mark 2 1 ] [text <| boardContent board 2 1]
-                , button [ class "square", onClick <| Mark 2 2 ] [text <| boardContent board 2 2]
+                [ button [ class "square", onClick <| Mark 2 0 ] [text <| boardContent game.board 2 0]
+                , button [ class "square", onClick <| Mark 2 1 ] [text <| boardContent game.board 2 1]
+                , button [ class "square", onClick <| Mark 2 2 ] [text <| boardContent game.board 2 2]
                 ]
             ]
         ]
