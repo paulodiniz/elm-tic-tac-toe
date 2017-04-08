@@ -45,7 +45,24 @@ update msg game =
         NoOp ->
             ( game, Cmd.none )
         Mark posX posY ->
-            ( { game | board = set (loc posX posY) CircleMarked game.board }, Cmd.none )
+            ( { game | board = set (loc posX posY) (mark game.turn) game.board, turn = otherPlayer game.turn }, Cmd.none )
+
+
+mark : Player -> SquareState
+mark player =
+    case player of
+        Player1 ->
+            XMarked
+        Player2 ->
+            CircleMarked
+
+otherPlayer : Player -> Player
+otherPlayer player =
+    case player of
+        Player1 ->
+            Player2
+        Player2 ->
+            Player1
 
 
 -- SUBSCRIPTIONS
