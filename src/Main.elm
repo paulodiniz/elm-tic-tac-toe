@@ -33,20 +33,18 @@ init =
     ( initialModel, Cmd.none )
 
 
-
 -- UPDATE
 
-type Msg
-    = NoOp | Mark Int Int
+type Msg = NoOp | Mark Int Int
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Msg -> Board -> ( Board, Cmd Msg )
+update msg board =
     case msg of
         NoOp ->
-            ( model, Cmd.none )
+            ( board, Cmd.none )
         Mark posX posY ->
-            ( model, Cmd.none )
+            ( set (loc posX posY) XMarked board, Cmd.none )
 
 
 -- SUBSCRIPTIONS
@@ -60,9 +58,19 @@ boardContent : Board -> Int -> Int -> String
 boardContent board posX posY =
     case get (loc posX posY) board of
         Just value ->
-            value |> toString
+            value |> squareToString
         Nothing ->
-            Blank |> toString
+            Blank |> squareToString
+
+squareToString: SquareState -> String
+squareToString square =
+  case square of
+      Blank ->
+          String.fromChar ' '
+      XMarked ->
+          String.fromChar 'X'
+      CircleMarked ->
+          String.fromChar 'O'
 
 -- VIEW
 
