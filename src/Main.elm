@@ -20,6 +20,7 @@ type alias Board = Matrix SquareState
 type alias Game =
         { board: Board
         , turn: Player
+        , finished: Bool
         }
 
 
@@ -27,6 +28,7 @@ initialGame : Game
 initialGame =
     { board = square 3 (\_ -> Blank )
     , turn = Player1
+    , finished = False
     }
 
 
