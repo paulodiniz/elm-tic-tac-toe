@@ -47,7 +47,14 @@ update msg game =
                 squareContent = get (loc posX posY) game.board
                 newBoard      = set (loc posX posY) squareState game.board
             in
-                ( { game | board = newBoard, turn = player }, Cmd.none )
+                case squareContent of
+                    Just a ->
+                        if (a == Blank) then
+                          ( { game | board = newBoard, turn = player }, Cmd.none )
+                        else
+                          ( game, Cmd.none )
+                    _ ->
+                        ( { game | board = newBoard, turn = player }, Cmd.none )
 
 mark : Player -> SquareState
 mark player =
@@ -110,5 +117,5 @@ view game =
                 , button [ class "square", onClick <| Mark 2 2 ] [text <| boardContent game.board 2 2]
                 ]
             ]
-        , div [] [text <| "Turn of" ++ (toString game.turn) ]
+        , div [] [text <| "Turn of " ++ (toString game.turn) ]
         ]
