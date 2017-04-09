@@ -35,18 +35,19 @@ init =
     ( initialGame, Cmd.none )
 
 
--- UPDATE
-
-type Msg = NoOp | Mark Int Int
+type Msg = Mark Int Int
 
 update : Msg -> Game -> ( Game, Cmd Msg )
 update msg game =
     case msg of
-        NoOp ->
-            ( game, Cmd.none )
         Mark posX posY ->
-            ( { game | board = set (loc posX posY) (mark game.turn) game.board, turn = otherPlayer game.turn }, Cmd.none )
-
+            let
+                squareState   = mark game.turn
+                player        = otherPlayer game.turn squareState
+                squareContent = get (loc posX posY) game.board
+                newBoard      = set (loc posX posY) squareState game.board
+            in
+                ( { game | board = newBoard, turn = player }, Cmd.none )
 
 mark : Player -> SquareState
 mark player =
@@ -56,16 +57,13 @@ mark player =
         Player2 ->
             CircleMarked
 
-otherPlayer : Player -> Player
-otherPlayer player =
-    case player of
-        Player1 ->
-            Player2
-        Player2 ->
-            Player1
-
-
--- SUBSCRIPTIONS
+otherPlayer : Player -> SquareState -> Player
+otherPlayer player squareState =
+      case player of
+          Player1 ->
+              Player2
+          Player2 ->
+              Player1
 
 subscriptions : Game -> Sub Msg
 subscriptions model =
@@ -112,4 +110,5 @@ view game =
                 , button [ class "square", onClick <| Mark 2 2 ] [text <| boardContent game.board 2 2]
                 ]
             ]
+        , div [] [text <| "Turn of" ++ (toString game.turn) ]
         ]
